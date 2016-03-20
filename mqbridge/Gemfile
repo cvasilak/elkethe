@@ -1,0 +1,6 @@
+source 'https://rubygems.org'
+
+gem 'mqtt',            '~>0.3.0'
+gem 'hawkular-client', '~>0.2.1',  :git => "https://github.com/hawkular/hawkular-client-ruby.git", :branch => "master"
+gem 'addressable',     '~>2.4.0'
+gem 'json',            '~>1.8.2'

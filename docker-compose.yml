@@ -1,0 +1,83 @@
+# -Elkethe Tank Monitoring-
+# MAINTAINER Christos Vasilakis <cvasilak@gmail.com>
+
+version: '2'
+
+services:
+
+  data:
+    image: alpine:3.3
+    command: echo Data Container
+    user: 999:999
+    labels:
+      org.cvasilak.elkethe.app: "Tanks"
+      org.cvasilak.elkethe.tanks.role: "Volume Container"
+
+  dbstate:
+    extends:
+      file: docker-compose.yml
+      service: data
+    volumes:
+      - /var/lib/cassandra
+
+  db:
+    image: cassandra:2.2.5
+    volumes_from:
+      - dbstate
+    environment:
+      - CASSANDRA_START_RPC=true
+      - SERVICE_NAME=db
+    labels:
+      org.cvasilak.elkethe.app: "Tanks"
+      org.cvasilak.elkethe.tanks.role: "Cassandra Database"
+
+  hawkular:
+    build: ./hawkular
+    restart: always
+    links:
+      - db
+    environment:
+      - DEFAULT_TTL=730
+      - CASSANDRA_NODES=db
+      - SERVICE_NAME=hawkular
+    labels:
+      org.cvasilak.elkethe.app: "Tanks"
+      org.cvasilak.elkethe.tanks.role: "Hawkular Metrics"
+
+  mosquitto:
+    image: toke/mosquitto@sha256:888adc272b3de42059f7a1e6368dd3b7a30a637669e27dbc5325678fbc52caff
+    restart: always
+    links:
+      - hawkular
+    environment:
+      - SERVICE_NAME=mosquitto
+    ports:
+      - "1883:1883" # expose native mqtt port
+      - "9001:9001" # expose websocket port
+    labels:
+      org.cvasilak.elkethe.app: "Tanks"
+      org.cvasilak.elkethe.tanks.role: "Mosquitto MQTT"
+
+  mqbridge:
+    build: ./mqbridge
+    restart: always
+    links:
+      - mosquitto
+    environment:
+      - SERVICE_NAME=mqbridge
+    labels:
+      org.cvasilak.elkethe.app: "Tanks"
+      org.cvasilak.elkethe.tanks.role: "Hawkular MQTT-bridge"
+
+  grafana:
+    build: ./grafana
+    restart: always
+    links:
+      - hawkular
+    environment:
+      - SERVICE_NAME=grafana
+    ports:
+      - "80:3000"
+    labels:
+      org.cvasilak.elkethe.app: "Tanks"
+      org.cvasilak.elkethe.tanks.role: "Grafana"
