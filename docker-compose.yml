@@ -45,7 +45,7 @@ services:
       org.cvasilak.elkethe.tanks.role: "Hawkular Metrics"
 
   mosquitto:
-    image: toke/mosquitto@sha256:888adc272b3de42059f7a1e6368dd3b7a30a637669e27dbc5325678fbc52caff
+    build: ./mosquitto
     restart: always
     links:
       - hawkular
