@@ -13,17 +13,24 @@ services:
       org.cvasilak.elkethe.app: "Tanks"
       org.cvasilak.elkethe.tanks.role: "Volume Container"
 
-  dbstate:
+  dbcassandra:
     extends:
       file: docker-compose.yml
       service: data
     volumes:
       - /var/lib/cassandra
 
-  db:
+  dbgrafana:
+    extends:
+      file: docker-compose.yml
+      service: data
+    volumes:
+      - /var/lib/grafana
+
+  cassandra:
     image: cassandra:2.2.5
     volumes_from:
-      - dbstate
+      - dbcassandra
     environment:
       - CASSANDRA_START_RPC=true
       - SERVICE_NAME=db
@@ -35,10 +42,10 @@ services:
     build: ./hawkular
     restart: always
     links:
-      - db
+      - cassandra
     environment:
       - DEFAULT_TTL=730
-      - CASSANDRA_NODES=db
+      - CASSANDRA_NODES=cassandra
       - SERVICE_NAME=hawkular
     labels:
       org.cvasilak.elkethe.app: "Tanks"
@@ -70,7 +77,9 @@ services:
       org.cvasilak.elkethe.tanks.role: "Hawkular MQTT-bridge"
 
   grafana:
-    build: ./grafana
+    image: grafana/grafana:2.6.0
+    volumes_from:
+      - dbgrafana
     restart: always
     links:
       - hawkular
