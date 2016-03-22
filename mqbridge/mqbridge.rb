@@ -4,15 +4,17 @@ require 'bundler/setup'
 require 'mqtt'
 require 'hawkular_all'
 
-CREDS = {username: 'jdoe', password: 'password'}
+HAWKULAR_CREDS = {username: "#{ENV["HAWKULAR_USER"]}", password: "#{ENV["HAWKULAR_PASS"]}"}
+MQTT_CREDS = {username: "#{ENV["MQTT_USER"]}", password: "#{ENV["MQTT_PASS"]}"}
+
 TENANT= {tenant: 'elkethe'}
 
 METRICS_BASE = 'http://hawkular:8080/hawkular/metrics'
-MQTT_BROKER = "mqtt://#{CREDS[:username]}:#{CREDS[:password]}@mosquitto"
+MQTT_BROKER = "mqtt://#{MQTT_CREDS[:username]}:#{MQTT_CREDS[:password]}@mosquitto"
 
 @queue = []
 
-@metrics_client = Hawkular::Metrics::Client.new(METRICS_BASE, CREDS, TENANT)
+@metrics_client = Hawkular::Metrics::Client.new(METRICS_BASE, HAWKULAR_CREDS, TENANT)
 
 def process_metric(message)
   return if message.nil? || message.empty?

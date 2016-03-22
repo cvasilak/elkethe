@@ -67,6 +67,7 @@ services:
 
   mqbridge:
     build: ./mqbridge
+    env_file: .mqbridge.env
     restart: always
     links:
       - mosquitto
@@ -78,6 +79,7 @@ services:
 
   grafana:
     image: grafana/grafana:2.6.0
+    env_file: .grafana.env
     volumes_from:
       - dbgrafana
     restart: always
