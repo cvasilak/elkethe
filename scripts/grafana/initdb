@@ -1,0 +1,5 @@
+#!/bin/sh
+
+docker run --rm --volumes-from elkethe_grafana_1  -v $(pwd):/scripts alpine:3.3 cp /scripts/grafana.db /var/lib/grafana
+docker-compose restart grafana
+echo "grafana-db restored."
