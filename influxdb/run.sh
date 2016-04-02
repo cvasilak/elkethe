@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# setup
 set -m
 CONFIG_FILE="/config/config.toml"
 INFLUX_HOST="localhost"
