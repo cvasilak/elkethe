@@ -1,4 +1,5 @@
 FROM alpine:3.3
+MAINTAINER Christos Vasilakis <cvasilak@gmail.com>
 
 ENV BUILD_PACKAGES mosquitto
 

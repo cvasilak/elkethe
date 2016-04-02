@@ -1,4 +1,5 @@
 FROM alpine:3.3
+MAINTAINER Christos Vasilakis <cvasilak@gmail.com>
 
 ENV BUILD_PACKAGES bash ruby-dev build-base git
 ENV RUBY_PACKAGES ruby ruby-io-console ruby-bundler

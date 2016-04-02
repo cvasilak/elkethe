@@ -13,12 +13,12 @@ services:
       org.cvasilak.elkethe.app: "Tanks"
       org.cvasilak.elkethe.tanks.role: "Volume Container"
 
-  dbcassandra:
+  dbinfluxdb:
     extends:
       file: docker-compose.yml
       service: data
     volumes:
-      - /var/lib/cassandra
+      - /var/influxdb:/data
 
   dbgrafana:
     extends:
@@ -27,35 +27,21 @@ services:
     volumes:
       - /var/lib/grafana
 
-  cassandra:
-    image: cassandra:2.2.5
-    volumes_from:
-      - dbcassandra
-    environment:
-      - CASSANDRA_START_RPC=true
-      - SERVICE_NAME=db
-    labels:
-      org.cvasilak.elkethe.app: "Tanks"
-      org.cvasilak.elkethe.tanks.role: "Cassandra Database"
-
-  hawkular:
-    build: ./hawkular
+  influxdb:
+    build: ./influxdb
     restart: always
-    links:
-      - cassandra
-    environment:
-      - DEFAULT_TTL=730
-      - CASSANDRA_NODES=cassandra
-      - SERVICE_NAME=hawkular
+    volumes_from:
+      - dbinfluxdb
+    env_file: .influxdb.env
     labels:
       org.cvasilak.elkethe.app: "Tanks"
-      org.cvasilak.elkethe.tanks.role: "Hawkular Metrics"
+      org.cvasilak.elkethe.tanks.role: "InfluxDB Database"
 
   mosquitto:
     build: ./mosquitto
     restart: always
     links:
-      - hawkular
+      - influxdb
     environment:
       - SERVICE_NAME=mosquitto
     ports:
@@ -78,13 +64,13 @@ services:
       org.cvasilak.elkethe.tanks.role: "Hawkular MQTT-bridge"
 
   grafana:
-    image: grafana/grafana:2.6.0
+    image: grafana/grafana:3.0.0-beta1
     env_file: .grafana.env
     volumes_from:
       - dbgrafana
     restart: always
     links:
-      - hawkular
+      - influxdb
     environment:
       - SERVICE_NAME=grafana
     ports:
