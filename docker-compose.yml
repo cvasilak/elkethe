@@ -64,7 +64,7 @@ services:
       org.cvasilak.elkethe.tanks.role: "Hawkular MQTT-bridge"
 
   grafana:
-    image: grafana/grafana:3.0.0-beta1
+    build: ./grafana
     env_file: .grafana.env
     volumes_from:
       - dbgrafana
