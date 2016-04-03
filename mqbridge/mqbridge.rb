@@ -27,17 +27,17 @@ def process_metric(message)
       {
           series: 'voltage',
           tags: {tank: fields[1]},
-          values: {value: fields[2]}
+          values: {value: fields[2].to_f}
       },
       {
           series: 'knocks',
           tags: {tank: fields[1]},
-          values: {value: fields[3]}
+          values: {value: fields[3].to_f}
       },
       {
           series: 'errors',
           tags: {tank: fields[1]},
-          values: {value: fields[4]}
+          values: {value: fields[4].to_f}
       }
   ]
 
