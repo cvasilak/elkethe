@@ -5,12 +5,9 @@ require 'mqtt'
 require 'influxdb'
 
 MQTT_CREDS = {username: "#{ENV["MQTT_USER"]}", password: "#{ENV["MQTT_PASS"]}"}
-MQTT_BROKER = "mqtt://#{MQTT_CREDS[:username]}:#{MQTT_CREDS[:password]}@mosquitto"
-
 INFLUXDB_CREDS = {username: "#{ENV["INFLUXDB_USER"]}", password: "#{ENV["INFLUXDB_PASS"]}"}
-@influxdb_client = InfluxDB::Client.new 'elkethe', {host: 'influxdb'}.merge(INFLUXDB_CREDS)
 
-@queue = []
+MQTT_BROKER = "mqtt://#{MQTT_CREDS[:username]}:#{MQTT_CREDS[:password]}@mosquitto"
 
 def process_metric(message)
   return if message.nil? || message.empty?
@@ -18,7 +15,7 @@ def process_metric(message)
   # data format is : 2 Tank-A5 3 0 1 90
   fields = message.split(' ')
 
-  if fields.size < 6
+  if fields.size < 6 || !fields[1].start_with?('Tank-')
     puts 'invalid record detected, ignoring'
     return
   end
@@ -41,21 +38,13 @@ def process_metric(message)
       }
   ]
 
-  begin
-    @influxdb_client.write_points(data)
-
-    # There was data queued, send it now
-    if @queue.size > 0
-      @queue.each do |_entry|
-        data = @queue.pop
-        influxdb.write_points(data)
-      end
-    end
-  rescue
-    # Pushing failed -> we need to pool and try later
-    @queue.push data
-  end
+  @influxdb_client.write_points(data)
 end
+
+# attempt to connect to db
+@influxdb_client = InfluxDB::Client.new 'elkethe', {host: 'influxdb', retry: false}.merge(INFLUXDB_CREDS)
+# do an initial ping to verify  connection, exit eager upon failure can't do much
+@influxdb_client.list_databases
 
 # subscribe to MQTT and listen..
 MQTT::Client.connect(MQTT_BROKER) do |c|
