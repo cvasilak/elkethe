@@ -35,11 +35,16 @@ def process_metric(message)
       {
           series: 'errors',
           tags: {tank: tank},
-          values: {value: fields[4].to_f}
+          values: {value: fields[4].to_i}
+      },
+      {
+          series: 'force',
+          tags: {tank: tank},
+          values: {value: fields[5].to_i}
       }
   ]
 
-  knocks = fields[3].to_f
+  knocks = fields[3].to_i
   if knocks > 0
     puts "['#{tank}'] knocks > 0 detected, appending it"
     data << {
