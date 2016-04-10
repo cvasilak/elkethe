@@ -2,11 +2,14 @@ GEM
   remote: https://rubygems.org/
   specs:
     cause (0.1)
+    hitimes (1.2.3)
     influxdb (0.2.3)
       cause
       json
     json (1.8.3)
     mqtt (0.3.1)
+    timers (4.1.1)
+      hitimes
 
 PLATFORMS
   ruby
@@ -14,6 +17,4 @@ PLATFORMS
 DEPENDENCIES
   influxdb (~> 0.2.3)
   mqtt (~> 0.3.0)
-
-BUNDLED WITH
-   1.11.2
+  timers (~> 4.1, >= 4.1.1)
