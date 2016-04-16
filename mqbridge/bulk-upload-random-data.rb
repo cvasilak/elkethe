@@ -4,32 +4,32 @@ require 'bundler/setup'
 require 'influxdb'
 
 INFLUXDB_CREDS = {username: "#{ENV["INFLUXDB_USER"]}", password: "#{ENV["INFLUXDB_PASS"]}"}
-@influxdb_client = InfluxDB::Client.new 'elkethe', {host: 'influxdb'}.merge(INFLUXDB_CREDS)
+@influxdb_client = InfluxDB::Client.new 'elkethe', {host: 'influxdb', retry: false, time_precision: 'ms'}.merge(INFLUXDB_CREDS)
 
-(1420070400000..1461974400000).step(60000) do |timestamp|
+(1423194517000..1460332800000).step(1000) do |timestamp|
 
   data = [
       {
           series: 'voltage',
-          tags: {tank: 'Tank-A3'},
-          values: {value: rand(0.1..90.0)},
+          tags: {tank: 'Tank-A99'},
+          values: {value: rand(2.70..3.30)},
           timestamp: timestamp
       },
       {
           series: 'knocks',
-          tags: {tank: 'Tank-A3'},
-          values: {value: rand(0.1..40.0)},
+          tags: {tank: 'Tank-A99'},
+          values: {value: rand(1..20)},
           timestamp: timestamp
       },
       {
           series: 'errors',
-          tags: {tank: 'Tank-A3'},
-          values: {value: rand(0.1..20.0)},
+          tags: {tank: 'Tank-A99'},
+          values: {value: rand(0..5)},
           timestamp: timestamp
       }
   ]
 
   puts "--> #{data}"
-  @influxdb_client.write_points(data, 'ms')
+  @influxdb_client.write_points(data)
 
 end
