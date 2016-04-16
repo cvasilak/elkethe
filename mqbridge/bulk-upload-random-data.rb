@@ -4,7 +4,7 @@ require 'bundler/setup'
 require 'influxdb'
 
 INFLUXDB_CREDS = {username: "#{ENV["INFLUXDB_USER"]}", password: "#{ENV["INFLUXDB_PASS"]}"}
-@influxdb_client = InfluxDB::Client.new 'elkethe', {host: 'influxdb', retry: false, time_precision: 'ms'}.merge(INFLUXDB_CREDS)
+@influxdb_client = InfluxDB::Client.new 'behaviour', {host: 'influxdb', retry: false, time_precision: 'ms'}.merge(INFLUXDB_CREDS)
 
 (1423194517000..1460332800000).step(1000) do |timestamp|
 
