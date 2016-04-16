@@ -4,6 +4,7 @@ require 'bundler/setup'
 require 'mqtt'
 require 'influxdb'
 require 'timers'
+require 'thread'
 
 MQTT_CREDS = {username: "#{ENV["MQTT_USER"]}", password: "#{ENV["MQTT_PASS"]}"}
 INFLUXDB_CREDS = {username: "#{ENV["INFLUXDB_USER"]}", password: "#{ENV["INFLUXDB_PASS"]}"}
@@ -85,18 +86,18 @@ def process_metric(message)
 end
 
 # attempt to connect to db
-@influxdb_client = InfluxDB::Client.new 'elkethe', {host: 'influxdb', retry: false, time_precision: 'ms'}.merge(INFLUXDB_CREDS)
+@influxdb_client = InfluxDB::Client.new 'behaviour', {host: 'influxdb', retry: false, time_precision: 'ms'}.merge(INFLUXDB_CREDS)
 # do an initial ping to verify connection, exit eager upon failure, can't do much either
 @influxdb_client.list_databases
 
 # subscribe to MQTT and listen..
 MQTT::Client.connect(MQTT_BROKER) do |c|
-  c.subscribe('/elkethe/tanks/+')
+  c.subscribe('/behaviour/tanks/+')
 
-  c.get('/elkethe/tanks/+') do |topic, message|
+  c.get('/behaviour/tanks/+') do |topic, message|
     puts "#{topic}: #{message}"
 
-    process_metric(message)
+    Thread.new { process_metric(message) }
   end
   
   puts "Ready."
