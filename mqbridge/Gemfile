@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
 
 gem 'mqtt',            '~>0.3.0'
-gem 'influxdb',        '~> 0.2.3'
+gem 'influxdb',        '~> 0.3.8'
 gem 'timers', '~> 4.1', '>= 4.1.1'
